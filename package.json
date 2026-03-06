@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "cp-search",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
   "scripts": {
     "build": "node --experimental-strip-types ./tools/build.ts --minify",
