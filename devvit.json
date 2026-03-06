@@ -1,16 +1,6 @@
 {
   "$schema": "https://developers.reddit.com/schema/config-file.v1.json",
   "name": "cp-search",
-  "post": {
-    "dir": "public",
-    "entrypoints": {
-      "default": {
-        "inline": true,
-        "height": "regular",
-        "entry": "splash.html"
-      }
-    }
-  },
   "server": {
     "dir": "dist/server",
     "entry": "index.js"
