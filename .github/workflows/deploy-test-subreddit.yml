@@ -56,4 +56,19 @@ jobs:
             exit 1
           fi
 
-          npx devvit install "$TEST_SUBREDDIT"
+          # A fresh upload can take a short time before it's installable.
+          max_attempts=8
+          for attempt in $(seq 1 $max_attempts); do
+            echo "Install attempt ${attempt}/${max_attempts}..."
+            if npx devvit install "$TEST_SUBREDDIT"; then
+              exit 0
+            fi
+
+            if [ "$attempt" -lt "$max_attempts" ]; then
+              echo "App version not ready yet. Waiting 20s before retry..."
+              sleep 20
+            fi
+          done
+
+          echo "Install failed after ${max_attempts} attempts."
+          exit 1
