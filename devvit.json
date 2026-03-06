@@ -15,20 +15,6 @@
     "dir": "dist/server",
     "entry": "index.js"
   },
-  "menu": {
-    "items": [
-      {
-        "label": "Create a new post",
-        "description": "cp-search",
-        "location": "subreddit",
-        "forUserType": "moderator",
-        "endpoint": "/internal/menu/post-create"
-      }
-    ]
-  },
-  "triggers": {
-    "onAppInstall": "/internal/on-app-install"
-  },
   "scripts": {
     "dev": "node --experimental-strip-types ./tools/build.ts --watch",
     "build": "node --experimental-strip-types ./tools/build.ts --minify"

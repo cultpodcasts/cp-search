@@ -1,11 +1,5 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { reddit } from "@devvit/web/server";
-import type {
-  PartialJsonValue,
-  TriggerResponse,
-  UiResponse,
-} from "@devvit/web/shared";
-import { InternalEndpoint } from "../shared/api.ts";
+import type { PartialJsonValue } from "@devvit/web/shared";
 
 export async function serverOnRequest(
   req: IncomingMessage,
@@ -24,49 +18,14 @@ async function onRequest(
   req: IncomingMessage,
   rsp: ServerResponse,
 ): Promise<void> {
-  const endpoint = req.url?.split("?")[0];
-
-  if (!endpoint || endpoint === "/") {
-    writeJSON<ErrorResponse>(404, { error: "not found", status: 404 }, rsp);
-    return;
-  }
-
-  let body: UiResponse | TriggerResponse | ErrorResponse;
-  switch (endpoint) {
-    case InternalEndpoint.OnPostCreate:
-      body = await onMenuNewPost();
-      break;
-    case InternalEndpoint.OnAppInstall:
-      body = await onAppInstall();
-      break;
-    default:
-      body = { error: "not found", status: 404 };
-      break;
-  }
-
-  writeJSON<PartialJsonValue>("status" in body ? body.status : 200, body, rsp);
+  void req;
+  writeJSON<ErrorResponse>(404, { error: "not found", status: 404 }, rsp);
 }
 
 type ErrorResponse = {
   error: string;
   status: number;
 };
-
-async function onMenuNewPost(): Promise<UiResponse> {
-  const post = await reddit.submitCustomPost({ title: "Cult Podcasts Search" });
-  return {
-    showToast: { text: `Post ${post.id} created.`, appearance: "success" },
-    navigateTo: post.url,
-  };
-}
-
-async function onAppInstall(): Promise<TriggerResponse> {
-  await reddit.submitCustomPost({
-    title: "Cult Podcasts Search",
-  });
-
-  return {};
-}
 
 function writeJSON<T extends PartialJsonValue>(
   status: number,
