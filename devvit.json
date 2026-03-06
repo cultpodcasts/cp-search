@@ -8,9 +8,6 @@
         "inline": true,
         "height": "regular",
         "entry": "splash.html"
-      },
-      "game": {
-        "entry": "game.html"
       }
     }
   },
