@@ -1,0 +1,59 @@
+name: Deploy To Test Subreddit
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "devvit.json"
+      - "package.json"
+      - "package-lock.json"
+      - "public/**"
+      - "src/**"
+      - "tools/**"
+      - ".github/workflows/deploy-test-subreddit.yml"
+  workflow_dispatch:
+    inputs:
+      subreddit:
+        description: "Test subreddit to install to (r/ prefix optional)"
+        required: false
+        default: "cp_search_dev"
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      DEVVIT_AUTH_TOKEN: ${{ secrets.DEVVIT_AUTH_TOKEN }}
+      TEST_SUBREDDIT: ${{ github.event.inputs.subreddit || vars.DEVVIT_TEST_SUBREDDIT }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: npm
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Verify Devvit Auth
+        run: npx devvit whoami
+
+      - name: Upload Latest App Version
+        run: npm run deploy
+
+      - name: Install Latest Version To Test Subreddit
+        run: |
+          if [ -z "$TEST_SUBREDDIT" ]; then
+            echo "No test subreddit configured."
+            echo "Set workflow input 'subreddit' or repository variable DEVVIT_TEST_SUBREDDIT."
+            exit 1
+          fi
+
+          npx devvit install "$TEST_SUBREDDIT"
