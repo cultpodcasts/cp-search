@@ -47,3 +47,25 @@ What it does:
 
 - Automatic: push to `main`.
 - Manual: Actions -> `Deploy To Test Subreddit` -> `Run workflow`.
+
+## GitHub Action: Deploy To Production Subreddit
+
+This repo includes `.github/workflows/deploy-production-subreddit.yml`.
+
+What it does:
+
+- Runs only as a manual workflow (`workflow_dispatch`)
+- Publishes the latest app version (`npm run launch`)
+- Installs latest into a real subreddit after publish processing completes
+
+### One-Time Setup
+
+1. Reuse the existing `DEVVIT_AUTH_TOKEN` secret.
+2. Set the production subreddit:
+	- Option A: set repository variable `DEVVIT_PROD_SUBREDDIT`.
+	- Option B: set repository secret `DEVVIT_PROD_SUBREDDIT`.
+	- Option C: pass `subreddit` when manually running the workflow.
+
+### Run It
+
+- Manual only: Actions -> `Deploy To Production Subreddit` -> `Run workflow`.

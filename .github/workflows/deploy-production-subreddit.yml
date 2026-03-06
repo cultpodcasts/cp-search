@@ -1,0 +1,64 @@
+name: Deploy To Production Subreddit
+
+on:
+  workflow_dispatch:
+    inputs:
+      subreddit:
+        description: "Production subreddit to install to (r/ prefix optional)"
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      DEVVIT_AUTH_TOKEN: ${{ secrets.DEVVIT_AUTH_TOKEN }}
+      PROD_SUBREDDIT: ${{ github.event.inputs.subreddit || vars.DEVVIT_PROD_SUBREDDIT || secrets.DEVVIT_PROD_SUBREDDIT }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: npm
+
+      - name: Validate Production Subreddit Input
+        run: |
+          if [ -z "$PROD_SUBREDDIT" ]; then
+            echo "No production subreddit configured."
+            echo "Set workflow input 'subreddit', repository variable DEVVIT_PROD_SUBREDDIT, or secret DEVVIT_PROD_SUBREDDIT."
+            exit 1
+          fi
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Verify Devvit Auth
+        run: npx devvit whoami
+
+      - name: Publish Latest App Version
+        run: npm run launch
+
+      - name: Install Latest Version To Production Subreddit
+        run: |
+          # A fresh publish can take time before it is installable.
+          max_attempts=12
+          for attempt in $(seq 1 $max_attempts); do
+            echo "Production install attempt ${attempt}/${max_attempts}..."
+            if npx devvit install "$PROD_SUBREDDIT"; then
+              exit 0
+            fi
+
+            if [ "$attempt" -lt "$max_attempts" ]; then
+              echo "Published version not ready yet. Waiting 30s before retry..."
+              sleep 30
+            fi
+          done
+
+          echo "Production install failed after ${max_attempts} attempts."
+          exit 1
