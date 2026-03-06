@@ -1,71 +1,71 @@
-## Devvit Hello World Starter
+# CultPodcasts Research Companion
 
-A starter to build web applications on Reddit's developer platform
+First release of a purpose-built Reddit app for the `r/cultpodcasts` community.
 
-- [Devvit](https://developers.reddit.com/): A way to build and deploy immersive games on Reddit
-- [TypeScript](https://www.typescriptlang.org/): For type safety
+This project helps researchers, students, journalists, and curious listeners learn more about cults and coercive control by turning podcast discussion into a structured, searchable, and community-aware research experience.
 
-## Getting Started
+## Why This App Exists
 
-> Make sure you have Node 22 downloaded on your machine before running!
+The `r/cultpodcasts` subreddit is rich with episode breakdowns, personal reflections, source links, and cross-community context. Until now, that knowledge has mostly lived in long comment threads.
 
-1. Run `npm create devvit@latest --template=hello-world`
-2. Go through the installation wizard. You will need to create a Reddit account and connect it to Reddit developers
-3. Copy the command on the success page into your terminal
+This application is our first step toward making that information easier to discover, compare, and study responsibly.
 
-## Commands
+## Release Focus
 
-- `npm run dev`: Starts a development server where you can develop your application live on Reddit.
-- `npm run build`: Builds your client and server projects
-- `npm run deploy`: Uploads a new version of your app
-- `npm run launch`: Publishes your app for review
-- `npm run login`: Logs your CLI into Reddit
-- `npm run type-check`: Type checks, lints, and prettifies your app
+This first version is designed to:
 
-## GitHub Action: Deploy To Test Subreddit
+- Support exploration of cult-related podcast content in a single Reddit-native experience.
+- Highlight patterns connected to coercive control narratives discussed by the community.
+- Reduce friction for early-stage research and topic mapping.
+- Create a foundation for future moderation and research tooling.
 
-This repo includes `.github/workflows/deploy-test-subreddit.yml`.
+## Who This Is For
 
-What it does:
+- Researchers studying cult dynamics, influence systems, and coercive control.
+- Journalists and documentarians reviewing public narratives and source trails.
+- Students exploring media literacy and manipulation patterns.
+- Community members in `r/cultpodcasts` who want better discovery across discussions.
 
-- Runs on pushes to `main` (for app and workflow file changes)
-- Supports manual runs via `workflow_dispatch`
-- Uploads the latest Devvit app version
-- Installs that latest version into your test subreddit
+## What You Can Do
 
-### One-Time Setup
+- Explore podcast-related cult discussions in one place.
+- Find patterns and recurring themes across cases and episodes.
+- Discover community-shared references and contextual links faster.
+- Build a cleaner starting point for deeper investigation.
 
-1. Create a GitHub repository secret named `DEVVIT_AUTH_TOKEN`.
-2. On a machine where `devvit login` already worked, read your local token file:
-	- Path: `~/.devvit/token`
-	- Copy the full file contents into the `DEVVIT_AUTH_TOKEN` secret.
-3. Set the test subreddit:
-	- Option A: set repository variable `DEVVIT_TEST_SUBREDDIT` (for push-triggered deploys).
-	- Option B: provide the `subreddit` input when manually running the workflow.
+## How To Use
 
-### Run It
+1. Open the app from the `r/cultpodcasts` subreddit.
+2. Start with a topic, podcast, or case you want to investigate.
+3. Review surfaced discussion and source context.
+4. Follow links and community notes for deeper research.
 
-- Automatic: push to `main`.
-- Manual: Actions -> `Deploy To Test Subreddit` -> `Run workflow`.
+## Community Guidelines
 
-## GitHub Action: Deploy To Production Subreddit
+- Respect privacy and avoid posting identifying personal information.
+- Prioritize verifiable sources over speculation.
+- Keep discussions civil, trauma-aware, and evidence-based.
+- Follow all subreddit and Reddit platform rules.
 
-This repo includes `.github/workflows/deploy-production-subreddit.yml`.
+## Research and Safety Note
 
-What it does:
+This app is an informational research aid built for community learning. It does not provide legal, medical, or mental health advice.
 
-- Runs only as a manual workflow (`workflow_dispatch`)
-- Publishes the latest app version (`npm run launch`)
-- Installs latest into a real subreddit after publish processing completes
+When discussing coercive control or cult-related harm, please follow subreddit rules, protect personal privacy, and prioritize verified sources.
 
-### One-Time Setup
+## Roadmap Direction
 
-1. Reuse the existing `DEVVIT_AUTH_TOKEN` secret.
-2. Set the production subreddit:
-	- Option A: set repository variable `DEVVIT_PROD_SUBREDDIT`.
-	- Option B: set repository secret `DEVVIT_PROD_SUBREDDIT`.
-	- Option C: pass `subreddit` when manually running the workflow.
+Planned areas for upcoming releases include:
 
-### Run It
+- Better filtering and topic clustering.
+- Improved source attribution workflows.
+- More structured support for comparative case analysis.
+- Enhanced moderation-aware research views.
 
-- Manual only: Actions -> `Deploy To Production Subreddit` -> `Run workflow`.
+## Contributing
+
+Community feedback is welcome. If you spot an issue or have an idea that would help researchers in `r/cultpodcasts`, share it with the community and moderators.
+
+## For Developers
+
+Developer setup, architecture notes, CI/CD workflows, and deployment instructions are documented in `GITHUB_README.md`.
