@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DEVVIT_AUTH_TOKEN: ${{ secrets.DEVVIT_AUTH_TOKEN }}
-      TEST_SUBREDDIT: ${{ github.event.inputs.subreddit || vars.DEVVIT_TEST_SUBREDDIT }}
+      TEST_SUBREDDIT: ${{ github.event.inputs.subreddit || vars.DEVVIT_TEST_SUBREDDIT || secrets.DEVVIT_TEST_SUBREDDIT }}
 
     steps:
       - name: Checkout
@@ -52,7 +52,7 @@ jobs:
         run: |
           if [ -z "$TEST_SUBREDDIT" ]; then
             echo "No test subreddit configured."
-            echo "Set workflow input 'subreddit' or repository variable DEVVIT_TEST_SUBREDDIT."
+            echo "Set workflow input 'subreddit', repository variable DEVVIT_TEST_SUBREDDIT, or secret DEVVIT_TEST_SUBREDDIT."
             exit 1
           fi
 
