@@ -15,6 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DEVVIT_AUTH_TOKEN: ${{ secrets.DEVVIT_AUTH_TOKEN }}
+      DEVVIT_ALLOW_SOURCE_UPLOAD: "1"
       PROD_SUBREDDIT: ${{ github.event.inputs.subreddit || vars.DEVVIT_PROD_SUBREDDIT || secrets.DEVVIT_PROD_SUBREDDIT }}
 
     steps:
