@@ -1,14 +1,16 @@
 {
   "private": true,
   "name": "cp-search",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "type": "module",
   "scripts": {
     "build": "node --experimental-strip-types ./tools/build.ts --minify",
-    "deploy": "npm run build && devvit upload",
+    "upload:private": "npm run build && devvit upload",
+    "publish:public": "npm run build && devvit publish --public",
+    "deploy": "npm run upload:private",
     "dev": "devvit playtest",
     "login": "devvit login",
-    "launch": "npm run build && npm run deploy && devvit publish",
+    "launch": "npm run publish:public",
     "type-check": "tsc --build"
   },
   "engines": {
