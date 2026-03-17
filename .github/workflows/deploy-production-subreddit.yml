@@ -40,10 +40,12 @@ jobs:
         run: npm ci
 
       - name: Verify Devvit Auth
-        run: npx devvit whoami
+        run: npx @devvit/cli whoami
 
       - name: Publish Latest App Version
-        run: npm run launch
+        run: |
+          npm run build
+          npx @devvit/cli publish --public
 
       - name: Install Latest Version To Production Subreddit
         run: |
@@ -51,7 +53,7 @@ jobs:
           max_attempts=12
           for attempt in $(seq 1 $max_attempts); do
             echo "Production install attempt ${attempt}/${max_attempts}..."
-            if npx devvit install "$PROD_SUBREDDIT"; then
+            if npx @devvit/cli install "$PROD_SUBREDDIT"; then
               exit 0
             fi
 
