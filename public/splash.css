@@ -179,6 +179,85 @@ body {
   border-color: var(--button-bg);
 }
 
+.hidden {
+  display: none;
+}
+
+.episode-title {
+  color: var(--title);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.35;
+  margin-bottom: 4px;
+}
+
+.episode-meta {
+  color: var(--body);
+  font-size: 0.82rem;
+  margin-bottom: 8px;
+}
+
+.service-switch {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.service-button {
+  border: 1px solid var(--input-border);
+  background: var(--input-bg);
+  color: var(--input-text);
+  border-radius: 999px;
+  padding: 5px 10px;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.service-button.active {
+  background: var(--button-bg);
+  color: var(--button-text);
+  border-color: var(--button-bg);
+}
+
+.player-wrap {
+  margin-top: 10px;
+}
+
+.episode-player {
+  width: 100%;
+  min-height: 220px;
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  background: #000;
+}
+
+.player-note {
+  margin-top: 6px;
+  color: var(--body);
+  font-size: 0.76rem;
+}
+
+.service-links {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.service-link {
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  padding: 5px 9px;
+  font-size: 0.76rem;
+  color: var(--input-text);
+  text-decoration: none;
+}
+
+.service-link:hover {
+  border-color: var(--button-bg);
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
