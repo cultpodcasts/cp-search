@@ -36,8 +36,9 @@ const ENDPOINT = {
 
 const AUTH0_ISSUER_ENV = "AUTH0_ISSUER_BASE_URL";
 const AUTH0_AUDIENCE_ENV = "AUTH0_AUDIENCE";
-const AUTH0_SCOPE_ENV = "AUTH0_REQUIRED_SCOPE";
-const DEFAULT_AUTH0_SCOPE = "episode:create";
+const AUTH0_ROLE_ENV = "AUTH0_REQUIRED_ROLE";
+const AUTH0_ROLE_CLAIM_ENV = "AUTH0_ROLE_CLAIM";
+const DEFAULT_AUTH0_ROLE_CLAIM = "roles";
 
 const jwksByIssuer = new Map<string, ReturnType<typeof createRemoteJWKSet>>();
 
@@ -540,12 +541,21 @@ async function authenticateMachineRequest(
       audience,
     });
 
-    const requiredScope = process.env[AUTH0_SCOPE_ENV] || DEFAULT_AUTH0_SCOPE;
-    if (!hasScope(verified.payload, requiredScope)) {
+    const requiredRole = getRequiredEnv(AUTH0_ROLE_ENV);
+    if (!requiredRole) {
+      return {
+        ok: false,
+        status: 503,
+        message: `${AUTH0_ROLE_ENV} must be configured`,
+      };
+    }
+
+    const roleClaim = process.env[AUTH0_ROLE_CLAIM_ENV] || DEFAULT_AUTH0_ROLE_CLAIM;
+    if (!hasRole(verified.payload, requiredRole, roleClaim)) {
       return {
         ok: false,
         status: 403,
-        message: `token missing required scope: ${requiredScope}`,
+        message: `token missing required role: ${requiredRole}`,
       };
     }
 
@@ -583,20 +593,47 @@ function getRequiredEnv(key: string): string | null {
   return value && value.trim() ? value.trim() : null;
 }
 
-function hasScope(payload: JWTPayload, requiredScope: string): boolean {
-  if (!requiredScope) {
+function hasRole(payload: JWTPayload, requiredRole: string, roleClaim: string): boolean {
+  if (!requiredRole) {
     return true;
   }
 
-  const scopeClaim = typeof payload.scope === "string" ? payload.scope : "";
-  const scopeList = scopeClaim.split(" ").map((scope) => scope.trim()).filter(Boolean);
-  if (scopeList.includes(requiredScope)) {
-    return true;
+  const claimValue = payload[roleClaim];
+  if (Array.isArray(claimValue)) {
+    return claimValue.some((role) => typeof role === "string" && role === requiredRole);
+  }
+
+  if (typeof claimValue === "string") {
+    // Some tokens encode roles as a space-delimited string.
+    const roles = claimValue.split(" ").map((role) => role.trim()).filter(Boolean);
+    if (roles.includes(requiredRole)) {
+      return true;
+    }
+  }
+
+  const fallbackRoles = payload.roles;
+  if (Array.isArray(fallbackRoles)) {
+    return fallbackRoles.some((role) => typeof role === "string" && role === requiredRole);
+  }
+
+  if (typeof fallbackRoles === "string") {
+    const roles = fallbackRoles.split(" ").map((role) => role.trim()).filter(Boolean);
+    if (roles.includes(requiredRole)) {
+      return true;
+    }
   }
 
   const permissionsClaim = payload.permissions;
   if (Array.isArray(permissionsClaim)) {
-    return permissionsClaim.some((scope) => scope === requiredScope);
+    // Backward-compatible fallback: some Auth0 setups emit roles in permissions.
+    return permissionsClaim.some((permission) => permission === requiredRole);
+  }
+
+  if (typeof permissionsClaim === "string") {
+    const permissions = permissionsClaim.split(" ").map((permission) => permission.trim()).filter(Boolean);
+    if (permissions.includes(requiredRole)) {
+      return true;
+    }
   }
 
   return false;
