@@ -15,6 +15,38 @@
     "dir": "dist/server",
     "entry": "index.js"
   },
+  "menu": {
+    "items": [
+      {
+        "label": "Create Search Box Post",
+        "description": "Create a search-focused app post",
+        "location": "subreddit",
+        "forUserType": "moderator",
+        "endpoint": "/internal/menu/post-create/search-box"
+      },
+      {
+        "label": "Create Podcast Focus Post",
+        "description": "Create a podcast-focused app post instance",
+        "location": "subreddit",
+        "forUserType": "moderator",
+        "endpoint": "/internal/menu/post-create/podcast-focus"
+      },
+      {
+        "label": "Create Episode Post",
+        "description": "Create an episode post with metadata and links",
+        "location": "subreddit",
+        "forUserType": "moderator",
+        "endpoint": "/internal/menu/poslett-create/episode"
+      }
+    ]
+  },
+  "triggers": {
+    "onAppInstall": "/internal/on-app-install"
+  },
+  "forms": {
+    "createPodcastFocusForm": "/internal/form/create-podcast-focus-form",
+    "createEpisodeForm": "/internal/form/create-episode-form"
+  },
   "scripts": {
     "dev": "node --experimental-strip-types ./tools/build.ts --watch",
     "build": "node --experimental-strip-types ./tools/build.ts --minify"

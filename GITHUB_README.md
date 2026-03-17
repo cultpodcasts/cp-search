@@ -79,3 +79,48 @@ Required setup:
 1. Create a branch from `main`.
 2. Run `npm run type-check` and `npm run build` before opening a PR.
 3. Open a pull request with clear release notes and testing notes.
+
+## Episode Create API (Machine-to-Machine)
+
+This app exposes an authenticated endpoint for external systems to create Episode custom posts:
+
+- `POST /api/episode/create`
+
+Authentication uses Auth0 M2M bearer tokens validated against Auth0 JWKS.
+
+Required environment variables:
+
+- `AUTH0_ISSUER_BASE_URL` (example: `https://your-tenant.us.auth0.com`)
+- `AUTH0_AUDIENCE` (the API audience configured in Auth0)
+
+Optional:
+
+- `AUTH0_REQUIRED_SCOPE` (default: `episode:create`)
+
+Request body:
+
+```json
+{
+	"title": "Episode 43: High-Control Narratives",
+	"description": "A discussion of influence and manipulation patterns.",
+	"releaseDateTime": "2026-03-17T16:30:00Z",
+	"duration": "1h 12m",
+	"serviceLinks": {
+		"youtube": "https://www.youtube.com/watch?v=abc123",
+		"spotify": "https://open.spotify.com/episode/xyz123",
+		"apple_podcasts": "https://podcasts.apple.com/us/podcast/example/id123456?i=100000000"
+	},
+	"subredditName": "cp_search_dev"
+}
+```
+
+Response body:
+
+```json
+{
+	"type": "episode_created",
+	"postType": "episode",
+	"postId": "t3_abc123",
+	"postUrl": "https://reddit.com/r/..."
+}
+```
