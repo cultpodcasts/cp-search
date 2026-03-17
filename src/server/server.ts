@@ -512,19 +512,31 @@ function asOptionalString(value: unknown): string | undefined {
 async function authenticateMachineRequest(
   req: IncomingMessage,
 ): Promise<{ ok: true; payload: JWTPayload } | { ok: false; status: number; message: string }> {
+  console.info("[auth0] validating bearer token", {
+    method: req.method,
+    path: req.url,
+    hasAuthorizationHeader: Boolean(req.headers.authorization),
+  });
+
   const authorization = req.headers.authorization;
   if (!authorization || !authorization.toLowerCase().startsWith("bearer ")) {
+    console.warn("[auth0] request missing bearer token");
     return { ok: false, status: 401, message: "missing bearer token" };
   }
 
   const token = authorization.slice("Bearer ".length).trim();
   if (!token) {
+    console.warn("[auth0] bearer token header was present but empty");
     return { ok: false, status: 401, message: "missing bearer token" };
   }
 
   const issuerConfig = getRequiredEnv(AUTH0_ISSUER_ENV);
   const audience = getRequiredEnv(AUTH0_AUDIENCE_ENV);
   if (!issuerConfig || !audience) {
+    console.error("[auth0] missing required Auth0 configuration", {
+      hasIssuer: Boolean(issuerConfig),
+      hasAudience: Boolean(audience),
+    });
     return {
       ok: false,
       status: 503,
@@ -541,8 +553,18 @@ async function authenticateMachineRequest(
       audience,
     });
 
+    console.info("[auth0] token signature/claims validated", {
+      subject: verified.payload.sub ?? null,
+      issuer: verified.payload.iss ?? null,
+      audience: verified.payload.aud ?? null,
+      expiresAt: verified.payload.exp ?? null,
+    });
+
     const requiredRole = getRequiredEnv(AUTH0_ROLE_ENV);
     if (!requiredRole) {
+      console.error("[auth0] missing required role configuration", {
+        envVar: AUTH0_ROLE_ENV,
+      });
       return {
         ok: false,
         status: 503,
@@ -551,7 +573,14 @@ async function authenticateMachineRequest(
     }
 
     const roleClaim = process.env[AUTH0_ROLE_CLAIM_ENV] || DEFAULT_AUTH0_ROLE_CLAIM;
-    if (!hasRole(verified.payload, requiredRole, roleClaim)) {
+    const authorized = hasRole(verified.payload, requiredRole, roleClaim);
+    if (!authorized) {
+      const claimValue = verified.payload[roleClaim];
+      console.warn("[auth0] token missing required role", {
+        requiredRole,
+        roleClaim,
+        roleClaimType: Array.isArray(claimValue) ? "array" : typeof claimValue,
+      });
       return {
         ok: false,
         status: 403,
@@ -559,11 +588,20 @@ async function authenticateMachineRequest(
       };
     }
 
+    console.info("[auth0] token authorized", {
+      requiredRole,
+      roleClaim,
+      subject: verified.payload.sub ?? null,
+    });
+
     return {
       ok: true,
       payload: verified.payload,
     };
-  } catch {
+  } catch (err) {
+    console.warn("[auth0] token verification failed", {
+      error: err instanceof Error ? err.message : String(err),
+    });
     return {
       ok: false,
       status: 401,
