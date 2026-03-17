@@ -12,12 +12,14 @@ Authorization: Bearer <token>
 
 Requests must include an Auth0 Bearer JWT in the `Authorization` header.
 
-**Required scope:** `episode:create` (default; configurable via `AUTH0_REQUIRED_SCOPE` env var)
+**Required role:** role configured in `AUTH0_REQUIRED_ROLE`.
+By default, roles are read from the `roles` claim. Override with `AUTH0_ROLE_CLAIM`.
 
 **Required env vars on the server:**
 - `AUTH0_ISSUER_BASE_URL` — Auth0 tenant base URL
 - `AUTH0_AUDIENCE` — expected audience claim
-- `AUTH0_REQUIRED_SCOPE` _(optional)_ — overrides the default `episode:create` scope
+- `AUTH0_REQUIRED_ROLE` — required role value that must be present in token claims
+- `AUTH0_ROLE_CLAIM` _(optional)_ — claim key that contains roles; defaults to `roles`
 
 ## Request Body
 
@@ -58,7 +60,7 @@ Requests must include an Auth0 Bearer JWT in the `Authorization` header.
 |--------|---------|
 | 400 | Request body failed validation |
 | 401 | Missing or malformed Bearer token |
-| 403 | Token lacks the required scope |
+| 403 | Token lacks the required role |
 | 500 | Post creation failed (e.g. payload too large — see below) |
 
 ## ⚠️ postData size constraint
