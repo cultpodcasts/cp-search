@@ -15,14 +15,11 @@ import {
 
 const POST_INSTANCE_INDEX_KEY = "post-instance-ids";
 const POST_INSTANCE_PREFIX = "post-instance:";
-const PODCAST_FORM_NAME = "createPodcastFocusForm";
 const EPISODE_FORM_NAME = "createEpisodeForm";
 
 const ENDPOINT = {
   MenuCreateSearchBox: "/internal/menu/post-create/search-box",
-  MenuCreatePodcastFocus: "/internal/menu/post-create/podcast-focus",
   MenuCreateEpisode: "/internal/menu/post-create/episode",
-  FormCreatePodcastFocus: "/internal/form/create-podcast-focus-form",
   FormCreateEpisode: "/internal/form/create-episode-form",
   ApiCreateEpisode: "/api/episode/create",
   ApiInit: "/api/init",
@@ -65,14 +62,8 @@ async function onRequest(
     case ENDPOINT.MenuCreateSearchBox:
       body = await onMenuNewPost(PostType.SearchBox);
       break;
-    case ENDPOINT.MenuCreatePodcastFocus:
-      body = onMenuPodcastFocus();
-      break;
     case ENDPOINT.MenuCreateEpisode:
       body = onMenuEpisode();
-      break;
-    case ENDPOINT.FormCreatePodcastFocus:
-      body = await onPodcastFocusFormSubmit(req);
       break;
     case ENDPOINT.FormCreateEpisode:
       body = await onEpisodeFormSubmit(req);
@@ -111,28 +102,6 @@ async function onMenuNewPost(postType: PostType): Promise<UiResponse> {
   };
 }
 
-function onMenuPodcastFocus(): UiResponse {
-  return {
-    showForm: {
-      name: PODCAST_FORM_NAME,
-      form: {
-        title: "Create Podcast Focus Post",
-        description: "Create a post instance for a specific podcast.",
-        acceptLabel: "Create Post",
-        fields: [
-          {
-            type: "string",
-            name: "podcastName",
-            label: "Podcast Name",
-            helpText: "Example: A Little Bit Culty",
-            required: true,
-          },
-        ],
-      },
-    },
-  };
-}
-
 function onMenuEpisode(): UiResponse {
   return {
     showForm: {
@@ -142,6 +111,12 @@ function onMenuEpisode(): UiResponse {
         description: "Create an episode instance with metadata and service links.",
         acceptLabel: "Create Episode",
         fields: [
+          {
+            type: "string",
+            name: "podcastName",
+            label: "Podcast Name",
+            required: true,
+          },
           {
             type: "string",
             name: "episodeTitle",
@@ -189,42 +164,20 @@ function onMenuEpisode(): UiResponse {
   };
 }
 
-async function onPodcastFocusFormSubmit(req: IncomingMessage): Promise<UiResponse> {
-  const cleanedPodcastName = await readPodcastNameFromForm(req);
-
-  if (!cleanedPodcastName) {
-    return {
-      showToast: {
-        text: "Podcast name is required.",
-      },
-    };
-  }
-
-  const instance = await createPostInstance(PostType.PodcastFocus, "menu", {
-    podcastName: cleanedPodcastName,
-  });
-
-  return {
-    showToast: {
-      text: `Created podcast post for ${cleanedPodcastName}.`,
-      appearance: "success",
-    },
-    navigateTo: instance.postUrl,
-  };
-}
 
 async function onEpisodeFormSubmit(req: IncomingMessage): Promise<UiResponse> {
   const values = await readFormValues(req);
 
+  const podcastName = readRequiredText(values, "podcastName");
   const episodeTitle = readRequiredText(values, "episodeTitle");
   const episodeDescription = readRequiredText(values, "episodeDescription");
   const releaseDateTime = readRequiredText(values, "releaseDateTime");
   const duration = readRequiredText(values, "duration");
 
-  if (!episodeTitle || !episodeDescription || !releaseDateTime || !duration) {
+  if (!podcastName || !episodeTitle || !episodeDescription || !releaseDateTime || !duration) {
     return {
       showToast: {
-        text: "Title, description, release date/time, and duration are required.",
+        text: "Podcast name, title, description, release date/time, and duration are required.",
       },
     };
   }
@@ -244,6 +197,7 @@ async function onEpisodeFormSubmit(req: IncomingMessage): Promise<UiResponse> {
   }
 
   const episode: EpisodePostData = {
+    podcastName,
     title: episodeTitle,
     description: episodeDescription,
     releaseDateTime,
@@ -297,12 +251,6 @@ async function onApiEpisodeCreate(
   };
 }
 
-async function readPodcastNameFromForm(req: IncomingMessage): Promise<string> {
-  const values = await readFormValues(req);
-  const podcastName = values.podcastName;
-  return typeof podcastName === "string" ? podcastName.trim() : "";
-}
-
 async function onAppInstall(): Promise<TriggerResponse> {
   await createPostInstance(PostType.SearchBox, "install");
 
@@ -331,7 +279,7 @@ function onApiInit(): InitResponse {
 async function createPostInstance(
   postType: PostType,
   createdBy: PostInstance["createdBy"],
-  options?: { podcastName?: string; episode?: EpisodePostData; subredditName?: string },
+  options?: { episode?: EpisodePostData; subredditName?: string },
 ): Promise<PostInstance> {
   const title = getPostTitle(postType, options);
   const post = await reddit.submitCustomPost({
@@ -349,7 +297,6 @@ async function createPostInstance(
     createdAt: new Date().toISOString(),
     createdBy,
     subreddit: context.subredditName ?? null,
-    podcastName: options?.podcastName,
     episode: options?.episode,
   };
 
@@ -360,15 +307,11 @@ async function createPostInstance(
 
 function getPostTitle(
   postType: PostType,
-  options?: { podcastName?: string; episode?: EpisodePostData; subredditName?: string },
+  options?: { episode?: EpisodePostData; subredditName?: string },
 ): string {
   switch (postType) {
     case PostType.SearchBox:
       return "CultPodcasts Search Box";
-    case PostType.PodcastFocus:
-      return options?.podcastName
-        ? `CultPodcasts Podcast Focus: ${options.podcastName}`
-        : "CultPodcasts Podcast Focus";
     case PostType.Episode:
       return options?.episode?.title
         ? `Episode: ${options.episode.title}`
@@ -381,20 +324,14 @@ function getPostTitle(
 
 function buildPostData(
   postType: PostType,
-  options?: { podcastName?: string; episode?: EpisodePostData; subredditName?: string },
+  options?: { episode?: EpisodePostData; subredditName?: string },
 ): {
   postType: PostType;
-  podcastName?: string;
   episode?: EpisodePostData;
 } {
   switch (postType) {
     case PostType.SearchBox:
       return { postType };
-    case PostType.PodcastFocus:
-      return {
-        postType,
-        ...(options?.podcastName ? { podcastName: options.podcastName } : {}),
-      };
     case PostType.Episode:
       return {
         postType,
@@ -456,7 +393,7 @@ function hasAtLeastOneServiceLink(links: EpisodePostData["serviceLinks"]): boole
 }
 
 function readPostType(value: unknown): PostType {
-  return value === PostType.PodcastFocus || value === PostType.Episode
+  return value === PostType.Episode
     ? value
     : PostType.SearchBox;
 }
@@ -466,13 +403,14 @@ function readEpisodeFromPostData(value: unknown): EpisodePostData | undefined {
     return undefined;
   }
 
+  const podcastName = typeof value.podcastName === "string" ? value.podcastName.trim() : "";
   const title = typeof value.title === "string" ? value.title.trim() : "";
   const description = typeof value.description === "string" ? value.description.trim() : "";
   const releaseDateTime =
     typeof value.releaseDateTime === "string" ? value.releaseDateTime.trim() : "";
   const duration = typeof value.duration === "string" ? value.duration.trim() : "";
 
-  if (!title || !description || !releaseDateTime || !duration) {
+  if (!podcastName || !title || !description || !releaseDateTime || !duration) {
     return undefined;
   }
 
@@ -488,6 +426,7 @@ function readEpisodeFromPostData(value: unknown): EpisodePostData | undefined {
   }
 
   return {
+    podcastName,
     title,
     description,
     releaseDateTime,
@@ -624,15 +563,16 @@ function parseCreateEpisodeApiRequest(
     return { ok: false, message: "request body must be a JSON object" };
   }
 
+  const podcastName = asRequiredString(payload.podcastName);
   const title = asRequiredString(payload.title);
   const description = asRequiredString(payload.description);
   const releaseDateTime = asRequiredString(payload.releaseDateTime);
   const duration = asRequiredString(payload.duration);
 
-  if (!title || !description || !releaseDateTime || !duration) {
+  if (!podcastName || !title || !description || !releaseDateTime || !duration) {
     return {
       ok: false,
-      message: "title, description, releaseDateTime, and duration are required",
+      message: "podcastName, title, description, releaseDateTime, and duration are required",
     };
   }
 
@@ -649,6 +589,7 @@ function parseCreateEpisodeApiRequest(
   return {
     ok: true,
     request: {
+      podcastName,
       title,
       description,
       releaseDateTime,

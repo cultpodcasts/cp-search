@@ -101,6 +101,7 @@ Request body:
 
 ```json
 {
+	"podcastName": "Sounds Like a Cult",
 	"title": "Episode 43: High-Control Narratives",
 	"description": "A discussion of influence and manipulation patterns.",
 	"releaseDateTime": "2026-03-17T16:30:00Z",

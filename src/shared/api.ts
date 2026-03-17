@@ -1,6 +1,5 @@
 export const PostType = {
 	SearchBox: "search_box",
-	PodcastFocus: "podcast_focus",
 	Episode: "episode",
 } as const;
 
@@ -17,6 +16,7 @@ export type PodcastService = (typeof PodcastService)[keyof typeof PodcastService
 export type EpisodeServiceLinks = Partial<Record<PodcastService, string>>;
 
 export type EpisodePostData = {
+	podcastName: string;
 	title: string;
 	description: string;
 	releaseDateTime: string;
@@ -50,6 +50,5 @@ export type PostInstance = {
 	createdAt: string;
 	createdBy: "menu" | "install" | "api";
 	subreddit: string | null;
-	podcastName?: string;
 	episode?: EpisodePostData;
 };
