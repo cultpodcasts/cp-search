@@ -46,6 +46,16 @@
   "triggers": {
     "onAppInstall": "/internal/on-app-install"
   },
+  "settings": {
+    "subreddit": {
+      "postTitleMaxLength": {
+        "type": "number",
+        "label": "Post title max length",
+        "helpText": "Maximum character count for episode post titles. Set this to match your subreddit's configured title length limit.",
+        "defaultValue": 300
+      }
+    }
+  },
   "forms": {
     "createEpisodeForm": "/internal/form/create-episode-form"
   },

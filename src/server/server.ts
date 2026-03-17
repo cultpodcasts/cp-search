@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { context, reddit, redis } from "@devvit/web/server";
+import { context, reddit, redis, settings } from "@devvit/web/server";
 import { once } from "node:events";
 import { createRemoteJWKSet, jwtVerify, type JWTPayload } from "jose";
 import type { PartialJsonValue, TriggerResponse, UiResponse } from "@devvit/web/shared";
@@ -16,6 +16,14 @@ import {
 const POST_INSTANCE_INDEX_KEY = "post-instance-ids";
 const POST_INSTANCE_PREFIX = "post-instance:";
 const EPISODE_FORM_NAME = "createEpisodeForm";
+const FALLBACK_POST_TITLE_MAX_LENGTH = 300;
+const POST_TITLE_MAX_LENGTH_SETTING = "postTitleMaxLength";
+
+type BasePostOptions = {
+  subredditName?: string;
+  flairId?: string;
+  flairText?: string;
+};
 
 const ENDPOINT = {
   MenuCreateSearchBox: "/internal/menu/post-create/search-box",
@@ -60,7 +68,7 @@ async function onRequest(
   let body: UiResponse | TriggerResponse | CreateEpisodeApiResponse | ErrorResponse;
   switch (url) {
     case ENDPOINT.MenuCreateSearchBox:
-      body = await onMenuNewPost(PostType.SearchBox);
+      body = await onMenuNewPost();
       break;
     case ENDPOINT.MenuCreateEpisode:
       body = onMenuEpisode();
@@ -90,8 +98,8 @@ type ErrorResponse = {
   status: number;
 };
 
-async function onMenuNewPost(postType: PostType): Promise<UiResponse> {
-  const instance = await createPostInstance(postType, "menu");
+async function onMenuNewPost(): Promise<UiResponse> {
+  const instance = await createPostInstance(PostType.SearchBox, "menu");
 
   return {
     showToast: {
@@ -158,6 +166,12 @@ function onMenuEpisode(): UiResponse {
             name: "applePodcastsUrl",
             label: "Apple Podcasts URL",
           },
+          {
+            type: "string",
+            name: "imageUrl",
+            label: "Image URL",
+            helpText: "URL of the episode thumbnail image (optional)",
+          },
         ],
       },
     },
@@ -196,6 +210,8 @@ async function onEpisodeFormSubmit(req: IncomingMessage): Promise<UiResponse> {
     };
   }
 
+  const imageUrl = readOptionalText(values, "imageUrl");
+
   const episode: EpisodePostData = {
     podcastName,
     title: episodeTitle,
@@ -203,6 +219,7 @@ async function onEpisodeFormSubmit(req: IncomingMessage): Promise<UiResponse> {
     releaseDateTime,
     duration,
     serviceLinks,
+    ...(imageUrl ? { imageUrl } : {}),
   };
 
   const instance = await createPostInstance(PostType.Episode, "menu", {
@@ -241,6 +258,8 @@ async function onApiEpisodeCreate(
   const instance = await createPostInstance(PostType.Episode, "api", {
     episode: parsed.request,
     subredditName: parsed.request.subredditName,
+    flairId: parsed.request.flairId,
+    flairText: parsed.request.flairText,
   });
 
   return {
@@ -277,17 +296,29 @@ function onApiInit(): InitResponse {
 }
 
 async function createPostInstance(
+  postType: typeof PostType.SearchBox,
+  createdBy: PostInstance["createdBy"],
+  options?: BasePostOptions,
+): Promise<PostInstance>;
+async function createPostInstance(
+  postType: typeof PostType.Episode,
+  createdBy: PostInstance["createdBy"],
+  options: BasePostOptions & { episode: EpisodePostData },
+): Promise<PostInstance>;
+async function createPostInstance(
   postType: PostType,
   createdBy: PostInstance["createdBy"],
-  options?: { episode?: EpisodePostData; subredditName?: string },
+  options?: BasePostOptions & { episode?: EpisodePostData },
 ): Promise<PostInstance> {
-  const title = getPostTitle(postType, options);
+  const title = await getPostTitle(postType, options);
   const entry = getEntryForPostType(postType);
   const post = await reddit.submitCustomPost({
     ...(options?.subredditName ? { subredditName: options.subredditName } : {}),
     entry,
     title,
     postData: buildPostData(postType, options),
+    ...(options?.flairId ? { flairId: options.flairId } : {}),
+    ...(options?.flairText ? { flairText: options.flairText } : {}),
   });
 
   const instance: PostInstance = {
@@ -319,26 +350,44 @@ function getEntryForPostType(postType: PostType): "search" | "episode" {
   }
 }
 
-function getPostTitle(
+async function getPostTitle(
   postType: PostType,
-  options?: { episode?: EpisodePostData; subredditName?: string },
-): string {
+  options?: BasePostOptions & { episode?: EpisodePostData },
+): Promise<string> {
   switch (postType) {
     case PostType.SearchBox:
       return "CultPodcasts Search Box";
-    case PostType.Episode:
-      return options?.episode?.title
-        ? `Episode: ${options.episode.title}`
-        : "CultPodcasts Episode";
+    case PostType.Episode: {
+      const ep = options?.episode;
+      if (!ep) {
+        throw new Error("EpisodePostData is required when creating an episode post.");
+      }
+      const maxLen =
+        (await settings.get<number>(POST_TITLE_MAX_LENGTH_SETTING)) ??
+        FALLBACK_POST_TITLE_MAX_LENGTH;
+      return buildEpisodePostTitle(ep.title, ep.podcastName, maxLen);
+    }
     default:
       postType satisfies never;
       return context.appName ?? "CultPodcasts Research Companion";
   }
 }
 
+function buildEpisodePostTitle(episodeTitle: string, podcastName: string, maxLen: number): string {
+  const separator = " – ";
+  const suffix = `${separator}${podcastName}`;
+  const budget = maxLen - suffix.length;
+  if (budget <= 0) return episodeTitle.slice(0, maxLen);
+  const truncated =
+    episodeTitle.length > budget
+      ? `${episodeTitle.slice(0, budget - 1)}…`
+      : episodeTitle;
+  return `${truncated}${suffix}`;
+}
+
 function buildPostData(
   postType: PostType,
-  options?: { episode?: EpisodePostData; subredditName?: string },
+  options?: BasePostOptions & { episode?: EpisodePostData },
 ): {
   postType: PostType;
   episode?: EpisodePostData;
@@ -347,9 +396,12 @@ function buildPostData(
     case PostType.SearchBox:
       return { postType };
     case PostType.Episode:
+      if (!options?.episode) {
+        throw new Error("EpisodePostData is required when creating an episode post.");
+      }
       return {
         postType,
-        ...(options?.episode ? { episode: options.episode } : {}),
+        episode: options.episode,
       };
     default:
       postType satisfies never;
@@ -439,6 +491,8 @@ function readEpisodeFromPostData(value: unknown): EpisodePostData | undefined {
     return undefined;
   }
 
+  const imageUrl = asOptionalString(value.imageUrl);
+
   return {
     podcastName,
     title,
@@ -446,6 +500,7 @@ function readEpisodeFromPostData(value: unknown): EpisodePostData | undefined {
     releaseDateTime,
     duration,
     serviceLinks,
+    ...(imageUrl ? { imageUrl } : {}),
   };
 }
 
@@ -599,6 +654,9 @@ function parseCreateEpisodeApiRequest(
   }
 
   const subredditName = asOptionalString(payload.subredditName);
+  const flairId = asOptionalString(payload.flairId);
+  const flairText = asOptionalString(payload.flairText);
+  const imageUrl = asOptionalString(payload.imageUrl);
 
   return {
     ok: true,
@@ -610,6 +668,9 @@ function parseCreateEpisodeApiRequest(
       duration,
       serviceLinks,
       ...(subredditName ? { subredditName } : {}),
+      ...(flairId ? { flairId } : {}),
+      ...(flairText ? { flairText } : {}),
+      ...(imageUrl ? { imageUrl } : {}),
     },
   };
 }

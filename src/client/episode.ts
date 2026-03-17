@@ -7,12 +7,15 @@ type EpisodeService = {
   embedUrl: string | null;
 };
 
-const description = document.getElementById("description") as HTMLParagraphElement;
-const episodeTitle = document.getElementById("episode-title") as HTMLHeadingElement;
-const episodeMeta = document.getElementById("episode-meta") as HTMLParagraphElement;
 const episodeDescription = document.getElementById("episode-description") as HTMLParagraphElement;
+const readMore = document.getElementById("read-more") as HTMLButtonElement;
+const episodeMeta = document.getElementById("episode-meta") as HTMLParagraphElement;
+const episodeImageWrap = document.getElementById("episode-image-wrap") as HTMLDivElement;
+const episodeImageBtn = document.getElementById("episode-image-btn") as HTMLButtonElement;
+const episodeImage = document.getElementById("episode-image") as HTMLImageElement;
 const serviceSwitch = document.getElementById("service-switch") as HTMLDivElement;
 const serviceLinks = document.getElementById("service-links") as HTMLDivElement;
+const playerWrap = document.getElementById("player-wrap") as HTMLDivElement;
 const playerFrame = document.getElementById("episode-player") as HTMLIFrameElement;
 const playerNote = document.getElementById("player-note") as HTMLParagraphElement;
 
@@ -22,43 +25,68 @@ async function initializeEpisodeMode(): Promise<void> {
   try {
     const rsp = await fetch("/api/init");
     if (!rsp.ok) {
-      description.textContent = "Episode details unavailable.";
+      episodeDescription.textContent = "Episode details unavailable.";
       return;
     }
 
     const init = (await rsp.json()) as InitResponse;
     if (init.postType !== PostType.Episode || !init.episode) {
-      description.textContent = "This post is not an episode.";
+      episodeDescription.textContent = "This post is not an episode.";
       return;
     }
 
     renderEpisode(init.episode);
   } catch {
-    description.textContent = "Episode details unavailable.";
+    episodeDescription.textContent = "Episode details unavailable.";
   }
 }
 
 function renderEpisode(episode: EpisodePostData): void {
-  description.textContent = "Episode spotlight";
-  episodeTitle.textContent = episode.title;
   episodeDescription.textContent = episode.description;
-  episodeMeta.textContent = formatEpisodeMeta(
-    episode.podcastName,
-    episode.releaseDateTime,
-    episode.duration,
-  );
+  setupReadMore(episodeDescription, readMore);
+
+  episodeMeta.textContent = formatEpisodeMeta(episode.releaseDateTime, episode.duration);
 
   const services = collectServices(episode);
   renderServiceLinks(services);
-  renderServiceSwitcher(services);
+
+  const hasImage = Boolean(episode.imageUrl?.trim());
+  renderServiceSwitcher(services, !hasImage);
+
+  if (hasImage) {
+    renderImage(episode.imageUrl!);
+  }
 }
 
-function formatEpisodeMeta(podcastName: string, releaseDateTime: string, duration: string): string {
+function setupReadMore(descEl: HTMLParagraphElement, btn: HTMLButtonElement): void {
+  void descEl.offsetHeight; // force layout computation
+  if (descEl.scrollHeight <= descEl.offsetHeight) {
+    return;
+  }
+  btn.classList.remove("hidden");
+  let expanded = false;
+  btn.addEventListener("click", () => {
+    expanded = !expanded;
+    descEl.classList.toggle("clamped", !expanded);
+    btn.textContent = expanded ? "Show less" : "Read more";
+  });
+}
+
+function renderImage(url: string): void {
+  episodeImage.src = url;
+  episodeImageWrap.classList.remove("hidden");
+  episodeImageBtn.addEventListener("click", () => {
+    playerWrap.classList.remove("hidden");
+    playerWrap.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  });
+}
+
+function formatEpisodeMeta(releaseDateTime: string, duration: string): string {
   const parsed = new Date(releaseDateTime);
   const dateText = Number.isNaN(parsed.getTime())
     ? releaseDateTime
-    : parsed.toLocaleString();
-  return `Podcast: ${podcastName} | Released: ${dateText} | Duration: ${duration}`;
+    : parsed.toLocaleDateString();
+  return `Released: ${dateText} · ${duration}`;
 }
 
 function collectServices(episode: EpisodePostData): EpisodeService[] {
@@ -112,16 +140,13 @@ function renderServiceLinks(services: EpisodeService[]): void {
   }
 }
 
-function renderServiceSwitcher(services: EpisodeService[]): void {
+function renderServiceSwitcher(services: EpisodeService[], autoShow: boolean): void {
   serviceSwitch.replaceChildren();
 
   if (services.length === 0) {
-    playerFrame.classList.add("hidden");
     playerNote.textContent = "No service links were provided for this episode.";
     return;
   }
-
-  playerFrame.classList.remove("hidden");
 
   for (const [index, item] of services.entries()) {
     const button = document.createElement("button");
@@ -129,12 +154,16 @@ function renderServiceSwitcher(services: EpisodeService[]): void {
     button.className = "service-button";
     button.textContent = item.label;
     button.addEventListener("click", () => {
+      playerWrap.classList.remove("hidden");
       selectService(item, button);
     });
 
     serviceSwitch.append(button);
     if (index === 0) {
       selectService(item, button);
+      if (autoShow) {
+        playerWrap.classList.remove("hidden");
+      }
     }
   }
 }

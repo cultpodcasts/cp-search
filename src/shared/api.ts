@@ -22,6 +22,7 @@ export type EpisodePostData = {
 	releaseDateTime: string;
 	duration: string;
 	serviceLinks: EpisodeServiceLinks;
+	imageUrl?: string;
 };
 
 export type InitResponse = {
@@ -32,6 +33,8 @@ export type InitResponse = {
 
 export type CreateEpisodeApiRequest = EpisodePostData & {
 	subredditName?: string;
+	flairId?: string;
+	flairText?: string;
 };
 
 export type CreateEpisodeApiResponse = {

@@ -12,28 +12,36 @@
   </head>
   <body class="app">
     <main class="card">
-      <p class="description" id="description"></p>
-      <section class="panel" aria-label="Episode details">
-  <h2 class="episode-title" id="episode-title">Episode</h2>
-  <p class="episode-meta" id="episode-meta"></p>
-  <p class="description" id="episode-description"></p>
+      <div class="episode-image-wrap hidden" id="episode-image-wrap">
+        <button class="episode-image-btn" id="episode-image-btn" type="button" aria-label="Play episode">
+          <img class="episode-image" id="episode-image" alt="" />
+          <span class="play-icon" aria-hidden="true">&#9654;</span>
+        </button>
+      </div>
 
-  <div class="service-switch" id="service-switch"></div>
+      <div class="description-wrap">
+        <p class="description clamped" id="episode-description"></p>
+        <button class="read-more hidden" id="read-more" type="button">Read more</button>
+      </div>
 
-  <div class="player-wrap" id="player-wrap">
-    <iframe
-      id="episode-player"
-      class="episode-player"
-      title="Episode player"
-      loading="lazy"
-      allow="autoplay; encrypted-media; picture-in-picture"
-      referrerpolicy="strict-origin-when-cross-origin"
-    ></iframe>
-    <p class="player-note" id="player-note"></p>
-  </div>
+      <p class="episode-meta" id="episode-meta"></p>
 
-  <div class="service-links" id="service-links"></div>
-</section>
+      <div class="service-switch" id="service-switch"></div>
+
+      <div class="player-wrap hidden" id="player-wrap">
+        <iframe
+          id="episode-player"
+          class="episode-player"
+          title="Episode player"
+          loading="lazy"
+          allow="autoplay; encrypted-media; picture-in-picture"
+          referrerpolicy="strict-origin-when-cross-origin"
+        ></iframe>
+        <p class="player-note" id="player-note"></p>
+      </div>
+
+      <div class="service-links" id="service-links"></div>
+    </main>
     <script type="module" src="episode.js" defer></script>
   </body>
 </html>
