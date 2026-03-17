@@ -1,4 +1,4 @@
-import { PodcastService, type EpisodePostData } from "../shared/api.ts";
+import { PodcastService, PostType, type EpisodePostData, type InitResponse } from "../shared/api.ts";
 
 type EpisodeService = {
   service: PodcastService;
@@ -16,7 +16,29 @@ const serviceLinks = document.getElementById("service-links") as HTMLDivElement;
 const playerFrame = document.getElementById("episode-player") as HTMLIFrameElement;
 const playerNote = document.getElementById("player-note") as HTMLParagraphElement;
 
-export function renderEpisode(episode: EpisodePostData): void {
+void initializeEpisodeMode();
+
+async function initializeEpisodeMode(): Promise<void> {
+  try {
+    const rsp = await fetch("/api/init");
+    if (!rsp.ok) {
+      description.textContent = "Episode details unavailable.";
+      return;
+    }
+
+    const init = (await rsp.json()) as InitResponse;
+    if (init.postType !== PostType.Episode || !init.episode) {
+      description.textContent = "This post is not an episode.";
+      return;
+    }
+
+    renderEpisode(init.episode);
+  } catch {
+    description.textContent = "Episode details unavailable.";
+  }
+}
+
+function renderEpisode(episode: EpisodePostData): void {
   description.textContent = "Episode spotlight";
   episodeTitle.textContent = episode.title;
   episodeDescription.textContent = episode.description;

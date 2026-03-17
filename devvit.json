@@ -7,7 +7,17 @@
       "default": {
         "inline": true,
         "height": "regular",
-        "entry": "app.html"
+        "entry": "search.html"
+      },
+      "search": {
+        "inline": true,
+        "height": "regular",
+        "entry": "search.html"
+      },
+      "episode": {
+        "inline": true,
+        "height": "tall",
+        "entry": "episode.html"
       }
     }
   },

@@ -282,8 +282,10 @@ async function createPostInstance(
   options?: { episode?: EpisodePostData; subredditName?: string },
 ): Promise<PostInstance> {
   const title = getPostTitle(postType, options);
+  const entry = getEntryForPostType(postType);
   const post = await reddit.submitCustomPost({
     ...(options?.subredditName ? { subredditName: options.subredditName } : {}),
+    entry,
     title,
     postData: buildPostData(postType, options),
   });
@@ -303,6 +305,18 @@ async function createPostInstance(
   await redis.set(`${POST_INSTANCE_PREFIX}${instance.postId}`, JSON.stringify(instance));
   await appendInstanceId(instance.postId);
   return instance;
+}
+
+function getEntryForPostType(postType: PostType): "search" | "episode" {
+  switch (postType) {
+    case PostType.SearchBox:
+      return "search";
+    case PostType.Episode:
+      return "episode";
+    default:
+      postType satisfies never;
+      return "search";
+  }
 }
 
 function getPostTitle(

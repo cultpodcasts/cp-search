@@ -1,10 +1,4 @@
-#search-panel {
-  width: 100%;
-  min-height: 100%;
-  padding: 8px;
-}
-
-#search-panel .card {
+.card {
   width: 100%;
   max-width: none;
   max-height: 100%;
@@ -19,19 +13,19 @@
   overflow: auto;
 }
 
-#search-panel .description {
+.description {
   color: var(--body);
   font-size: 1rem;
   line-height: 1.45;
 }
 
-#search-panel .intro-row {
+.intro-row {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-#search-panel .brand-logo {
+.brand-logo {
   width: 34px;
   height: 34px;
   object-fit: contain;
@@ -40,13 +34,13 @@
   background: #0b0c0d;
 }
 
-#search-panel .search-form {
+.search-form {
   display: flex;
   gap: 8px;
   align-items: center;
 }
 
-#search-panel .query-input {
+.query-input {
   flex: 1;
   min-width: 0;
   height: 34px;
@@ -58,13 +52,13 @@
   background-color: var(--input-bg);
 }
 
-#search-panel .query-input:focus {
+.query-input:focus {
   border-color: var(--button-bg);
   box-shadow: 0 0 0 3px var(--focus);
   outline: none;
 }
 
-#search-panel .search-button {
+.search-button {
   height: 34px;
   border: none;
   border-radius: 8px;
@@ -77,21 +71,21 @@
   transition: filter 0.15s ease;
 }
 
-#search-panel .search-button:hover {
+.search-button:hover {
   filter: brightness(1.08);
 }
 
-#search-panel .search-button:active {
+.search-button:active {
   filter: brightness(0.96);
 }
 
-#search-panel .panel {
+.panel {
   border: 1px solid var(--card-border);
   border-radius: 8px;
   padding: 8px;
 }
 
-#search-panel .panel-title {
+.panel-title {
   color: var(--body);
   font-size: 0.75rem;
   text-transform: uppercase;
@@ -99,13 +93,13 @@
   margin-bottom: 6px;
 }
 
-#search-panel .chip-row {
+.chip-row {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
 }
 
-#search-panel .chip {
+.chip {
   border: 1px solid var(--input-border);
   background: var(--input-bg);
   color: var(--input-text);
@@ -116,29 +110,29 @@
   cursor: pointer;
 }
 
-#search-panel .chip:hover {
+.chip:hover {
   border-color: var(--button-bg);
 }
 
 @media (max-width: 520px) {
-  #search-panel .card {
+  .card {
     padding: 8px;
   }
 
-  #search-panel .search-form {
+  .search-form {
     flex-direction: column;
     align-items: stretch;
   }
 
-  #search-panel .search-button {
+  .search-button {
     width: 100%;
   }
 
-  #search-panel .intro-row {
+  .intro-row {
     align-items: flex-start;
   }
 
-  #search-panel .panel {
+  .panel {
     padding: 7px;
   }
 }

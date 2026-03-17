@@ -1,10 +1,19 @@
-#episode-panel {
+.card {
   width: 100%;
-  min-height: 100%;
-  padding: 8px;
+  max-width: none;
+  max-height: 100%;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow: auto;
 }
 
-#episode-panel .panel {
+.panel {
   width: 100%;
   background: var(--card-bg);
   border: 1px solid var(--card-border);
@@ -12,13 +21,13 @@
   padding: 10px;
 }
 
-#episode-panel .description {
+.description {
   color: var(--body);
   font-size: 1rem;
   line-height: 1.45;
 }
 
-#episode-panel .episode-title {
+.episode-title {
   color: var(--title);
   font-size: 1rem;
   font-weight: 700;
@@ -26,20 +35,20 @@
   margin-bottom: 4px;
 }
 
-#episode-panel .episode-meta {
+.episode-meta {
   color: var(--body);
   font-size: 0.82rem;
   margin-bottom: 8px;
 }
 
-#episode-panel .service-switch {
+.service-switch {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
   margin-top: 8px;
 }
 
-#episode-panel .service-button {
+.service-button {
   border: 1px solid var(--input-border);
   background: var(--input-bg);
   color: var(--input-text);
@@ -49,17 +58,17 @@
   cursor: pointer;
 }
 
-#episode-panel .service-button.active {
+.service-button.active {
   background: var(--button-bg);
   color: var(--button-text);
   border-color: var(--button-bg);
 }
 
-#episode-panel .player-wrap {
+.player-wrap {
   margin-top: 10px;
 }
 
-#episode-panel .episode-player {
+.episode-player {
   width: 100%;
   min-height: 220px;
   border: 1px solid var(--card-border);
@@ -67,20 +76,20 @@
   background: #000;
 }
 
-#episode-panel .player-note {
+.player-note {
   margin-top: 6px;
   color: var(--body);
   font-size: 0.76rem;
 }
 
-#episode-panel .service-links {
+.service-links {
   margin-top: 10px;
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
 }
 
-#episode-panel .service-link {
+.service-link {
   border: 1px solid var(--input-border);
   border-radius: 8px;
   padding: 5px 9px;
@@ -89,6 +98,16 @@
   text-decoration: none;
 }
 
-#episode-panel .service-link:hover {
+.service-link:hover {
   border-color: var(--button-bg);
+}
+
+@media (max-width: 520px) {
+  .card {
+    padding: 8px;
+  }
+
+  .panel {
+    padding: 7px;
+  }
 }
