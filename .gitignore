@@ -4,3 +4,4 @@ dist
 .env
 public/*.js
 public/*.js.map
+public/app.html

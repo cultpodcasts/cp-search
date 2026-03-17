@@ -7,7 +7,7 @@
       "default": {
         "inline": true,
         "height": "regular",
-        "entry": "splash.html"
+        "entry": "app.html"
       }
     }
   },

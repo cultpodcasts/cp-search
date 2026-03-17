@@ -1,16 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <link rel="stylesheet" type="text/css" href="splash.css" />
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, width=device-width, height=device-height, user-scalable=0"
-    />
-    <title>devvit</title>
-  </head>
-  <body class="app">
-    <main class="card">
+<main class="card">
       <div class="intro-row" aria-label="Cult Podcasts search intro">
         <svg
           class="brand-logo"
@@ -29,132 +17,106 @@
           Enter a search term to open results on cultpodcasts.com:
         </p>
       </div>
-      <div id="search-panel">
       <form id="search-form" class="search-form" autocomplete="off">
-        <label class="sr-only" for="query-input">Search query</label>
-        <input
-          class="query-input"
-          id="query-input"
-          type="text"
-          placeholder="Try: Jonestown, NXIVM, Heaven's Gate"
-          maxlength="120"
-          required
-        />
-        <button class="search-button" id="search-button" type="submit">
-          Search
-        </button>
-      </form>
+    <label class="sr-only" for="query-input">Search query</label>
+    <input
+      class="query-input"
+      id="query-input"
+      type="text"
+      placeholder="Try: Jonestown, NXIVM, Heaven's Gate"
+      maxlength="120"
+      required
+    />
+    <button class="search-button" id="search-button" type="submit">
+      Search
+    </button>
+  </form>
 
-      <section class="panel" aria-label="Quick topics">
-        <h2 class="panel-title">Quick Topics</h2>
-        <div class="chip-row" id="chip-row">
-          <button class="chip" type="button" data-query="Jehovah's Witnesses">
-            Jehovah's Witnesses
-          </button>
-          <button class="chip" type="button" data-query="Scientology">
-            Scientology
-          </button>
-          <button
-            class="chip"
-            type="button"
-            data-query="The Church Of Jesus Christ Of Latter-Day Saints"
-          >
-            The Church Of Jesus Christ Of Latter-Day Saints
-          </button>
-          <button class="chip" type="button" data-query="Human Trafficking">
-            Human Trafficking
-          </button>
-          <button class="chip" type="button" data-query="Cult Psychology">
-            Cult Psychology
-          </button>
-          <button class="chip" type="button" data-query="Chad Daybell">
-            Chad Daybell
-          </button>
-          <button class="chip" type="button" data-query="Cult Recovery">
-            Cult Recovery
-          </button>
-          <button class="chip" type="button" data-query="Psychology">
-            Psychology
-          </button>
-          <button class="chip" type="button" data-query="Evangelicalism">
-            Evangelicalism
-          </button>
-          <button
-            class="chip"
-            type="button"
-            data-query="Plymouth Brethren Christian Church"
-          >
-            Plymouth Brethren Christian Church
-          </button>
-          <button class="chip" type="button" data-query="Joshua Media Ministries">
-            Joshua Media Ministries
-          </button>
-          <button class="chip" type="button" data-query="Catholicism">
-            Catholicism
-          </button>
-          <button class="chip" type="button" data-query="Cult-Expert">
-            Cult-Expert
-          </button>
-          <button class="chip" type="button" data-query="Sean Combs">
-            Sean Combs
-          </button>
-          <button class="chip" type="button" data-query="Qanon">
-            Qanon
-          </button>
-          <button class="chip" type="button" data-query="Multi-Level Marketing">
-            Multi-Level Marketing
-          </button>
-          <button class="chip" type="button" data-query="NXIVM">
-            NXIVM
-          </button>
-          <button
-            class="chip"
-            type="button"
-            data-query="Independent Fundamentalist Baptist"
-          >
-            Independent Fundamentalist Baptist
-          </button>
-          <button class="chip" type="button" data-query="William M. Branham">
-            William M. Branham
-          </button>
-          <button class="chip" type="button" data-query="Peoples Temple">
-            Peoples Temple
-          </button>
-          <button class="chip" type="button" data-query="Opus Dei">
-            Opus Dei
-          </button>
-          <button class="chip" type="button" data-query="FLDS Church">
-            FLDS Church
-          </button>
-          <button class="chip" type="button" data-query="Children Of God">
-            Children Of God
-          </button>
-        </div>
-      </section>
-      </div>
+  <section class="panel" aria-label="Quick topics">
+    <h2 class="panel-title">Quick Topics</h2>
+    <div class="chip-row" id="chip-row">
+      <button class="chip" type="button" data-query="Jehovah's Witnesses">
+        Jehovah's Witnesses
+      </button>
+      <button class="chip" type="button" data-query="Scientology">
+        Scientology
+      </button>
+      <button
+        class="chip"
+        type="button"
+        data-query="The Church Of Jesus Christ Of Latter-Day Saints"
+      >
+        The Church Of Jesus Christ Of Latter-Day Saints
+      </button>
+      <button class="chip" type="button" data-query="Human Trafficking">
+        Human Trafficking
+      </button>
+      <button class="chip" type="button" data-query="Cult Psychology">
+        Cult Psychology
+      </button>
+      <button class="chip" type="button" data-query="Chad Daybell">
+        Chad Daybell
+      </button>
+      <button class="chip" type="button" data-query="Cult Recovery">
+        Cult Recovery
+      </button>
+      <button class="chip" type="button" data-query="Psychology">
+        Psychology
+      </button>
+      <button class="chip" type="button" data-query="Evangelicalism">
+        Evangelicalism
+      </button>
+      <button
+        class="chip"
+        type="button"
+        data-query="Plymouth Brethren Christian Church"
+      >
+        Plymouth Brethren Christian Church
+      </button>
+      <button class="chip" type="button" data-query="Joshua Media Ministries">
+        Joshua Media Ministries
+      </button>
+      <button class="chip" type="button" data-query="Catholicism">
+        Catholicism
+      </button>
+      <button class="chip" type="button" data-query="Cult-Expert">
+        Cult-Expert
+      </button>
+      <button class="chip" type="button" data-query="Sean Combs">
+        Sean Combs
+      </button>
+      <button class="chip" type="button" data-query="Qanon">
+        Qanon
+      </button>
+      <button class="chip" type="button" data-query="Multi-Level Marketing">
+        Multi-Level Marketing
+      </button>
+      <button class="chip" type="button" data-query="NXIVM">
+        NXIVM
+      </button>
+      <button
+        class="chip"
+        type="button"
+        data-query="Independent Fundamentalist Baptist"
+      >
+        Independent Fundamentalist Baptist
+      </button>
+      <button class="chip" type="button" data-query="William M. Branham">
+        William M. Branham
+      </button>
+      <button class="chip" type="button" data-query="Peoples Temple">
+        Peoples Temple
+      </button>
+      <button class="chip" type="button" data-query="Opus Dei">
+        Opus Dei
+      </button>
+      <button class="chip" type="button" data-query="FLDS Church">
+        FLDS Church
+      </button>
+      <button class="chip" type="button" data-query="Children Of God">
+        Children Of God
+      </button>
+    </div>
+  </section>
+</main>
 
-      <section class="panel hidden" id="episode-panel" aria-label="Episode details">
-        <h2 class="episode-title" id="episode-title">Episode</h2>
-        <p class="episode-meta" id="episode-meta"></p>
-        <p class="description" id="episode-description"></p>
-
-        <div class="service-switch" id="service-switch"></div>
-
-        <div class="player-wrap" id="player-wrap">
-          <iframe
-            id="episode-player"
-            class="episode-player"
-            title="Episode player"
-            loading="lazy"
-            allow="autoplay; encrypted-media; picture-in-picture"
-            referrerpolicy="strict-origin-when-cross-origin"
-          ></iframe>
-          <p class="player-note" id="player-note"></p>
-        </div>
-
-        <div class="service-links" id="service-links"></div>
-      </section>
-    </main>
-    <script type="module" src="splash.js" defer></script>
-  </body>
-</html>

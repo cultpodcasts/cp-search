@@ -9,10 +9,26 @@
 // --watch     Automatically rebuild whenever an input changes.
 
 import fs from "node:fs";
+import path from "node:path";
 import type { BuildOptions } from "esbuild";
 import esbuild from "esbuild";
 
 const watch = process.argv.includes("--watch");
+
+function composeHtml(): void {
+  function resolveIncludes(source: string): string {
+    return source.replace(/<!--include:(\S+)-->/g, (_, name: string) => {
+      const fragment = fs
+        .readFileSync(path.join("src/client", name), "utf-8")
+        .trimEnd();
+      return resolveIncludes(fragment);
+    });
+  }
+
+  const shell = fs.readFileSync("src/client/shell.html", "utf-8");
+  const html = resolveIncludes(shell);
+  fs.writeFileSync("public/app.html", html);
+}
 
 const opts: BuildOptions = {
   bundle: true,
@@ -24,7 +40,7 @@ const opts: BuildOptions = {
 
 const clientOpts: BuildOptions = {
   ...opts,
-  entryPoints: ["src/client/splash.ts"],
+  entryPoints: ["src/client/app.ts"],
   format: "esm",
   outdir: "public",
   platform: "browser",
@@ -38,6 +54,7 @@ const serverOpts: BuildOptions = {
 };
 
 if (watch) {
+  composeHtml();
   const clientCtx = await esbuild.context(clientOpts);
   const serverCtx = await esbuild.context(serverOpts);
   await Promise.all([
@@ -45,6 +62,7 @@ if (watch) {
     watch ? serverCtx.watch() : undefined,
   ]);
 } else {
+  composeHtml();
   const [client, server] = await Promise.all([
     esbuild.build(clientOpts),
     esbuild.build(serverOpts),

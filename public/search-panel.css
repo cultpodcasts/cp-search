@@ -1,0 +1,144 @@
+#search-panel {
+  width: 100%;
+  min-height: 100%;
+  padding: 8px;
+}
+
+#search-panel .card {
+  width: 100%;
+  max-width: none;
+  max-height: 100%;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow: auto;
+}
+
+#search-panel .description {
+  color: var(--body);
+  font-size: 1rem;
+  line-height: 1.45;
+}
+
+#search-panel .intro-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#search-panel .brand-logo {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+  border-radius: 50%;
+  border: 1px solid var(--card-border);
+  background: #0b0c0d;
+}
+
+#search-panel .search-form {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+#search-panel .query-input {
+  flex: 1;
+  min-width: 0;
+  height: 34px;
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  padding: 0 10px;
+  font-size: 0.9rem;
+  color: var(--input-text);
+  background-color: var(--input-bg);
+}
+
+#search-panel .query-input:focus {
+  border-color: var(--button-bg);
+  box-shadow: 0 0 0 3px var(--focus);
+  outline: none;
+}
+
+#search-panel .search-button {
+  height: 34px;
+  border: none;
+  border-radius: 8px;
+  padding: 0 14px;
+  background: var(--button-bg);
+  color: var(--button-text);
+  font-size: 0.86rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter 0.15s ease;
+}
+
+#search-panel .search-button:hover {
+  filter: brightness(1.08);
+}
+
+#search-panel .search-button:active {
+  filter: brightness(0.96);
+}
+
+#search-panel .panel {
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  padding: 8px;
+}
+
+#search-panel .panel-title {
+  color: var(--body);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+
+#search-panel .chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+#search-panel .chip {
+  border: 1px solid var(--input-border);
+  background: var(--input-bg);
+  color: var(--input-text);
+  height: 28px;
+  padding: 0 9px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+#search-panel .chip:hover {
+  border-color: var(--button-bg);
+}
+
+@media (max-width: 520px) {
+  #search-panel .card {
+    padding: 8px;
+  }
+
+  #search-panel .search-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  #search-panel .search-button {
+    width: 100%;
+  }
+
+  #search-panel .intro-row {
+    align-items: flex-start;
+  }
+
+  #search-panel .panel {
+    padding: 7px;
+  }
+}
